@@ -77,3 +77,6 @@ enum CONF_ERROR is_readable(const char* path) {
      config_object = NULL;
  
  }
+/* Add a function to recursivelz check for key in the current config object and remove static config object passing it to the user in get config function */
+
+
