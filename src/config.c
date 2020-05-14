@@ -5,21 +5,7 @@
 static JSON_Value* config_value = NULL;
 static JSON_Object* config_object = NULL;
 
-enum CONF_ERROR is_readable(const char* path) {
-    
-    if (_access(path, 0) == -1) {
-        printf("config file does not exist or cannot be accesed");
-        return ERR_FILENOTEXISTS;
-    }
 
-    if (_access(path, 4) == -1) {
-        printf("config file does not have read permision");
-        return ERR_UNREADBLE;
-    }
-
-    return ERR_SUCCESS;
-
-}
 
  enum CONF_ERR get_config_from_file(const char* path) {
      enum CONF_ERR status = is_readable(path);

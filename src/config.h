@@ -1,14 +1,13 @@
-#pragma once
+#ifndef CONFIG_H
+#define CONFIG_H
 
-#include <io.h>
 #include <stdint.h>
 
 enum CONF_ERROR {
-    ERR_UNPARSABLE = -3,
-    ERR_FILENOTEXISTS = -2,
-    ERR_UNREADBLE = -1,
-    ERR_SUCCESS = 0,
-    ERR_KEYNOTEXIST = 1
+    ERR_UNPARSABLE,
+    ERR_UNREADBLE,
+    ERR_SUCCESS ,
+    ERR_KEYNOTEXIST
 
 };
 
@@ -24,3 +23,5 @@ enum CONF_ERROR get_json_number(double* value, char* key);
 enum CONF_ERROR get_json_int_number(int* value, char* key);
 
 void config_delete();
+
+#endif /* CONFIG_H */
