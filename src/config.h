@@ -7,21 +7,23 @@ enum CONF_ERROR {
     ERR_UNPARSABLE,
     ERR_UNREADBLE,
     ERR_SUCCESS ,
-    ERR_KEYNOTEXIST
-
+    ERR_KEYNOTEXIST,
+	ERR_WRONGVALUETYPE,
+	ERR_NULLCONFIG
 };
 
+typedef struct Config Config;
 
-enum CONF_ERR get_config_from_file(const char* path);
+Config* get_config_from_file(const char* path);
 
-enum CONF_ERR get_json_string(char**value, char* key);
+enum CONF_ERROR config_json_object_get_string(Config* config, char** value, const char* key); 
 
-enum CONF_ERROR get_json_boolean(int8_t* value, char* key);
+enum CONF_ERROR config_json_object_get_boolean(Config* config, int* value, const char* key);
 
-enum CONF_ERROR get_json_number(double* value, char* key);
+enum CONF_ERROR config_json_object_get_number(Config* config, double* value, const char* key);
 
-enum CONF_ERROR get_json_int_number(int* value, char* key);
+enum CONF_ERROR config_json_object_get_int_number(Config* config, int* value, const char* key); 
 
-void config_delete();
+void config_delete(Config* config);
 
 #endif /* CONFIG_H */

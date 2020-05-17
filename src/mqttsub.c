@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <mosquitto.h>
-#include <process.h>
 #include "config.h"
+#include "mqttsub.h"
 
 struct conn_config
 {
@@ -21,14 +21,14 @@ struct mqtt_client_pub
 	struct conn_config* conn_set;
 };
 
-int conn_config_set(struct conn_config* conn_sett) {
-	if (get_json_string(&(conn_sett->host), "conn_sett.host") != ERR_SUCCESS)
+int conn_config_set_from_json(Config* config_json, struct conn_config* conn_sett) {
+	if((config_json==NULL) || (conn_sett==NULL))
 		return -1;
-
-	if (get_json_int_number(&(conn_sett->port), "conn_sett.port") != ERR_SUCCESS)
+	if (config_json_object_get_string(config_json, &(conn_sett->host), "conn_sett.host") != ERR_SUCCESS)
 		return -1;
-
-	if (get_json_int_number(&(conn_sett->keepalive), "conn_sett.keepalive") != ERR_SUCCESS)
+	if (config_json_object_get_int_number(config_json, &(conn_sett->port), "conn_sett.port") != ERR_SUCCESS)
+		return -1;
+	if (config_json_object_get_int_number(config_json, &(conn_sett->keepalive), "conn_sett.keepalive") != ERR_SUCCESS)
 		return -1;
 	return 0;
 }
@@ -38,17 +38,16 @@ void conn_config_destroy(struct conn_config* conn) {
 	free(conn);
 }
 
-void mqtt_client_pub_set(struct mqtt_client_pub* pub) {
-
-	if (get_json_string(&(pub->topic), "topic") != ERR_SUCCESS)
+int mqtt_client_pub_set_from_json(Config* config_json, struct mqtt_client_pub* pub) {
+	if (config_json_object_get_string(config_json, &(pub->topic), "topic") != ERR_SUCCESS)
 		return -1;
-	if (get_json_int_number(&(pub->mid), "mid") != ERR_SUCCESS)
+	if (config_json_object_get_int_number(config_json, &(pub->mid), "mid") != ERR_SUCCESS)
 		return -1;
-	if (get_json_int_number(&(pub->qos), "qos") != ERR_SUCCESS)
+	if (config_json_object_get_int_number(config_json, &(pub->qos), "qos") != ERR_SUCCESS)
 		return -1;
-	if (get_json_boolean(&(pub->retain), "retain") != ERR_SUCCESS)
+	if (config_json_object_get_boolean(config_json, &(pub->retain), "retain") != ERR_SUCCESS)
 		return -1;
-	conn_config_set(pub->conn_set);
+	conn_config_set_from_json(config_json, pub->conn_set);
 
 }
 
@@ -61,28 +60,36 @@ enum mosq_err_t mqtt_mosq_set(struct mqtt_client_pub* pub) {
 struct mqtt_client_pub* mqtt_client_allocate() {
 
 	struct mqtt_client_pub* pub = malloc(sizeof(struct mqtt_client_pub));
-	if (!pub) {
+	if (pub == NULL) {
 		return NULL;
 	}
-
 	pub->conn_set = malloc(sizeof(struct conn_config));
-	if (!(pub->conn_set)) {
+	if ((pub->conn_set) == NULL) {
+		free(pub);
 		return NULL;
 	}
 	return pub;
-
 }
 
-struct mqtt_client_pub* mqtt_client_create(const char* path) {
+struct mqtt_client_pub* mqtt_client_create_from_json(const char* path) {
 	mosquitto_lib_init();
-	if (get_config_from_file(path) != ERR_SUCCESS)
+	Config* config_json = get_config_from_file(path);
+	if(config_json == NULL)
 		return NULL;
 	struct mqtt_client_pub* pub = mqtt_client_allocate();
-	if (!pub) {
+	
+	if (pub == NULL) {
+		config_delete(config_json);
 		return NULL;
 	}
-	mqtt_client_pub_set(pub);
-	mqtt_mosq_set(pub);
+	
+	if((mqtt_client_pub_set_from_json(config_json, pub) == -1)
+	   ||((mqtt_mosq_set(pub)==-1))){
+		mqtt_client_delete(pub);
+		config_delete(config_json);
+		return NULL;
+	}
+	config_delete(config_json);
 	return pub;
 }
 
@@ -113,7 +120,6 @@ void mqtt_client_delete(struct mqtt_client_pub* pub) {
 	conn_config_destroy(pub->conn_set);
 	pub->conn_set = NULL;
 	free(pub);
-	config_delete();
 }
 
 
@@ -121,6 +127,6 @@ void mqtt_client_delete(struct mqtt_client_pub* pub) {
 //to do 
 // add callbacks 
 // add publish overloads
-
+//add function set mqtt pub from json and from values
 
 

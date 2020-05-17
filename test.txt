@@ -1,4 +1,4 @@
-[{"conn_sett":{
+{"conn_sett":{
 				"host": "localhost",
 				"port": 2000,
 				"keepalive": 60
@@ -6,5 +6,5 @@
   "topic": "/topic",
   "mid":255,
   "qos":2,
-  "retain":false
-}]
+  "retain":true
+}
