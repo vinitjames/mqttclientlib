@@ -1,12 +1,13 @@
-#include "mqttpub.h"
+#include "mqttsub.h"
 #include "config.h"
-#include <Windows.h>
 #include <stdio.h>
-
+#include <unistd.h>
+ 
 int  main() {
 	
-	struct mqtt_client_pub* pub  = mqtt_client_create("test.txt");
-
+	struct mqtt_client_pub* pub  = mqtt_client_create_from_json("../test.txt");
+    display_mqtt_client_config(pub);
+	
 	int status = mqtt_client_connect(pub);
 	/*char* topic = NULL;
 	bool* retain = NULL;
@@ -18,14 +19,15 @@ int  main() {
 	ean(&retain, "retain");*/
 
 
-	//printf("%s \n", pub->topic);
+	printf("%d \n", status);
 	int i = 0;
-	while (++i < 100) {
+	while (++i < 5) {
 		status = mqtt_publish(pub, "test", 4);
 		printf("%d \n", status);
-		Sleep(2000);
+		sleep(2);
 	}
+	printf("clean up started \n");
 	mqtt_client_delete(pub);
 	pub = NULL;
-	printf("%d tesing is working \n", 0 );
+	printf("%d tesing is working \n");
 }

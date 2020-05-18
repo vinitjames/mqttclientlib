@@ -24,6 +24,7 @@ enum CONF_ERROR config_json_object_get_number(Config* config, double* value, con
 
 enum CONF_ERROR config_json_object_get_int_number(Config* config, int* value, const char* key); 
 
+
 void config_delete(Config* config);
 
 #endif /* CONFIG_H */

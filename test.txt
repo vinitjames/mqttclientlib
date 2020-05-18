@@ -1,6 +1,6 @@
 {"conn_sett":{
 				"host": "localhost",
-				"port": 2000,
+				"port": 1883,
 				"keepalive": 60
 			  },
   "topic": "/topic",
