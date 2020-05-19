@@ -5,7 +5,7 @@
  
 int  main() {
 	
-	struct mqtt_client_pub* pub  = mqtt_client_create_from_json("../test.txt");
+	struct mqtt_client_pub* pub  = mqtt_client_create_from_json("test.txt");
     display_mqtt_client_config(pub);
 	
 	int status = mqtt_client_connect(pub);
